@@ -37,12 +37,20 @@ if ('compiled_rna.rds' %in% list.files() == F){
   SaveSeuratRds(counts, file='compiled_rna.rds')
 }
 
-# perform standard analysis and save Seurat object
-if (exists('counts')==F){
-  counts <- LoadSeuratRds('compiled_rna.rds')}
+# perform standard QC/analysis and save Seurat object
+counts <- LoadSeuratRds('compiled_rna.rds') #skip this if running script for the first time
+counts[['percent.mt']] <- PercentageFeatureSet(counts, pattern='^MT-')
+counts <- subset(counts, subset=nFeature_RNA>100 & percent.mt<10)
 counts <- NormalizeData(counts)
+#for some reason the meta.data df isnt updated after filtering? 
+counts@assays[["RNA"]]@meta.data <- matrix(ncol=0, nrow=nrow(counts)) %>% as.data.frame()
 counts <- FindVariableFeatures(counts)
 counts <- ScaleData(counts)
+
+VariableFeaturePlot(counts) %>% 
+  LabelPoints(points=head(VariableFeatures(counts), 10), repel=T)
+ggsave('scatter_scRNA_processed_var.genes.pdf', height=5, width=8)
+
 counts <- RunPCA(counts)
 counts <- RunUMAP(counts, dims=1:30)
 SaveSeuratRds(counts, file='compiled_rna_processed.rds')
