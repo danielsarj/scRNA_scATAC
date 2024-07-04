@@ -10,7 +10,7 @@ setwd('/project2/gilad/daraujo/scRNA_scATAC')
 # check if compiled file already exists. run code if not.
 if ('compiled_atac.rds' %in% list.files() == F){
   # get ATAC peaks from 10x
-  atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/filtered_feature_bc_matrix.h5') %>%
+  atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/filtered_feature_bc_matrix.h5')
   atac.peaks <- atac.peaks$Peaks 
   # get ATAC cell IDs
   atac.cells <- CountFragments('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/atac_fragments.tsv.gz') %>% 
@@ -30,8 +30,8 @@ if ('compiled_atac.rds' %in% list.files() == F){
   # combine all batches/lanes
     for (j in seq(2,6)){
       # get ATAC peaks from 10x
-      atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch1/lane'%&%j%&%'/outs/filtered_feature_bc_matrix.h5') %>%
-        atac.peaks <- atac.peaks$Peaks 
+      atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch1/lane'%&%j%&%'/outs/filtered_feature_bc_matrix.h5')
+      atac.peaks <- atac.peaks$Peaks 
       # get ATAC cell IDs
       atac.cells <- CountFragments('/project/gilad/kenneth/caQTL/highpass/batch1/lane'%&%j%&%'/outs/atac_fragments.tsv.gz') %>% 
         filter(frequency_count>2000) %>% select(CB) %>% pull()
@@ -50,8 +50,8 @@ if ('compiled_atac.rds' %in% list.files() == F){
     }
   for (j in seq(1,7)){
     # get ATAC peaks from 10x
-    atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch2/lane'%&%j%&%'/outs/filtered_feature_bc_matrix.h5') %>%
-      atac.peaks <- atac.peaks$Peaks 
+    atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch2/lane'%&%j%&%'/outs/filtered_feature_bc_matrix.h5')
+    atac.peaks <- atac.peaks$Peaks 
     # get ATAC cell IDs
     atac.cells <- CountFragments('/project/gilad/kenneth/caQTL/highpass/batch2/lane'%&%j%&%'/outs/atac_fragments.tsv.gz') %>% 
       filter(frequency_count>2000) %>% select(CB) %>% pull()
