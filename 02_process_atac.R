@@ -25,7 +25,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
     filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
   # create ATAC Seurat object
   atac.assay <- CreateChromatinAssay(counts=counts, min.features=1000, fragments=atac.frags) %>%
-    CreateSeuratObject(project='1_1') %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='1_1')
+    CreateSeuratObject(project='1_1', assay='ATAC') %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='1_1')
 
   # combine all batches/lanes
     for (j in seq(2,6)){
@@ -45,7 +45,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
         filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
       # create ATAC Seurat object
       atac.assay.f <- CreateChromatinAssay(counts=counts, min.features=1000, fragments=atac.frags) %>%
-        CreateSeuratObject(project='1_'%&%j) %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='1_'%&%j)
+        CreateSeuratObject(project='1_'%&%j, assay='ATAC') %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='1_'%&%j)
       atac.assay <- merge(atac.assay, atac.assay.f)
     }
   for (j in seq(1,7)){
@@ -65,7 +65,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
       filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
     # create ATAC Seurat object
     atac.assay.f <- CreateChromatinAssay(counts=counts, min.features=1000, fragments=atac.frags) %>%
-      CreateSeuratObject(project='2_'%&%j) %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='2_'%&%j)
+      CreateSeuratObject(project='2_'%&%j, assay='ATAC') %>% subset(cells=cells_to_keep) %>% RenameCells(add.cell.id='2_'%&%j)
     atac.assay <- merge(atac.assay, atac.assay.f)
   }
   
@@ -83,7 +83,7 @@ Annotation(atac.assay) <- annotation
 atac.assay <- NucleosomeSignal(atac.assay)
 atac.assay <- TSSEnrichment(atac.assay)
 
-DensityScatter(atac.assay, x='nCount_RNA', y='TSS.enrichment', log_x=T, quantiles=T)
+DensityScatter(atac.assay, x='nCount_ATAC', y='TSS.enrichment', log_x=T, quantiles=T)
 ggsave('scatter_scATAC_processed_ncount.tssenrichment.pdf', height=5, width=8)
 
 SaveSeuratRds(atac.assay, file='compiled_atac_processed.rds')
