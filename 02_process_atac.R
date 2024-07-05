@@ -72,3 +72,18 @@ if ('compiled_atac.rds' %in% list.files() == F){
   rm(atac.assay.f, cells_to_keep, atac.peaks, atac.cells, atac.frags, counts)
   SaveSeuratRds(atac.assay, file='compiled_atac.rds')
 }
+
+# get gene annotations for hg38
+annotation <- GetGRangesFromEnsDb(ensdb=EnsDb.Hsapiens.v86)
+seqlevels(annotation) <- paste0('chr', seqlevels(annotation))
+
+# perform standard QC/analysis and save Seurat object
+atac.assay <- LoadSeuratRds('compiled_atac.rds') #skip this if running script for the first time
+Annotation(atac.assay) <- annotation
+atac.assay <- NucleosomeSignal(atac.assay)
+atac.assay <- TSSEnrichment(atac.assay)
+
+DensityScatter(atac.assay, x='nCount_RNA', y='TSS.enrichment', log_x=T, quantiles=T)
+ggsave('scatter_scATAC_processed_ncount.tssenrichment.pdf', height=5, width=8)
+
+SaveSeuratRds(atac.assay, file='compiled_atac_processed.rds')
