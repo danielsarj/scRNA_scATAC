@@ -86,4 +86,8 @@ atac.assay <- TSSEnrichment(atac.assay)
 DensityScatter(atac.assay, x='nCount_ATAC', y='TSS.enrichment', log_x=T, quantiles=T)
 ggsave('scatter_scATAC_processed_ncount.tssenrichment.pdf', height=5, width=8)
 
+atac.assay <- FindTopFeatures(atac.assay, min.cutoff='q25')
+atac.assay <- RunTFIDF(atac.assay)
+atac.assay <- RunSVD(atac.assay)
+
 SaveSeuratRds(atac.assay, file='compiled_atac_processed.rds')
