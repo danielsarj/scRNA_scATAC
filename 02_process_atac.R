@@ -89,5 +89,9 @@ ggsave('scatter_scATAC_processed_ncount.tssenrichment.pdf', height=5, width=8)
 atac.assay <- FindTopFeatures(atac.assay, min.cutoff='q25')
 atac.assay <- RunTFIDF(atac.assay)
 atac.assay <- RunSVD(atac.assay)
+atac.assay <- RunUMAP(atac.assay, reduction='lsi', dims=2:30, 
+                      reduction.name='umap.atac', reduction.key='atacUMAP_')
+DimPlot(atac.assay)
+ggsave('umap_scATAC_processed_bybatch.lane.pdf', height=5, width=8)
 
 SaveSeuratRds(atac.assay, file='compiled_atac_processed.rds')
