@@ -1,5 +1,6 @@
 library(Signac)
 library(Seurat)
+library(SeuratObject)
 library(tidyverse)
 library(data.table)
 "%&%" <- function(a,b) paste(a,b, sep = "")
@@ -33,17 +34,16 @@ transfer.anchors <- FindTransferAnchors(reference=rna.assay, query=atac.assay,
 # co-embed scRNA-seq and scATAC-seq datasets 
 var.genes <- VariableFeatures(rna.assay)
 refdata <- GetAssayData(JoinLayers(rna.assay), assay='RNA', slot='data')[var.genes,]
+####need to load Seurat4.4.0 and run next code
 atac.assay[['RNA']] <- TransferData(anchorset=transfer.anchors, refdata=refdata, 
                                     weight.reduction=atac.assay[['lsi']],
-                                    dims=2:30) ####error
-
+                                    dims=2:30) 
+####load Seurat5.1.0 again
 coembed <- merge(x=rna.assay, y=atac.assay)
+#coembed[['RNA']] <- as(object=coembed[['RNA']], Class='Assay')
 coembed <- ScaleData(coembed, features=var.genes, do.scale=F)
 coembed <- RunPCA(coembed, features=var.genes, verbose=F)
 coembed <- RunUMAP(coembed, dims=1:30)
-DimPlot(coembed, group.by = c("orig.ident"))
-
-DimPlot(coembed, group.by = c("orig.ident", "seurat_annotations"))
-
-
-
+DimPlot(coembed, group.by=c('dataset'))
+ggsave('umap_scRNA.scATAC.joint_by.dataset.pdf', height=5, width=7)
+SaveSeuratRds(coembed, file='rna_atac_joint.rds')
