@@ -93,5 +93,11 @@ atac.assay <- RunUMAP(atac.assay, reduction='lsi', dims=2:30,
                       reduction.name='umap.atac', reduction.key='atacUMAP_')
 DimPlot(atac.assay)
 ggsave('umap_scATAC_processed_bybatch.lane.pdf', height=5, width=8)
+atac.assay <- FindNeighbors(object=atac.assay, reduction='lsi', dims=2:30)
+atac.assay <- FindClusters(object=atac.assay, verbose=F, algorithm=3)
+atac.assay <- RunUMAP(atac.assay, reduction='lsi', dims=2:30, 
+                      reduction.name='umap.atac', reduction.key='atacUMAP_')
+DimPlot(atac.assay, label=T)
+ggsave('umap_scATAC_processed_bycluster.pdf', height=5, width=8)
 
 SaveSeuratRds(atac.assay, file='compiled_atac_processed.rds')
