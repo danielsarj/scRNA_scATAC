@@ -1,5 +1,6 @@
 library(Signac)
 library(Seurat)
+library(zellkonverter)
 library(GenomicRanges)
 library(EnsDb.Hsapiens.v86)
 library(tidyverse)
@@ -9,9 +10,9 @@ setwd('/project2/gilad/daraujo/scRNA_scATAC')
 
 # check if compiled file already exists. run code if not.
 if ('compiled_atac.rds' %in% list.files() == F){
-  # get ATAC peaks from 10x
-  atac.peaks <- Read10X_h5('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/filtered_feature_bc_matrix.h5')
-  atac.peaks <- atac.peaks$Peaks 
+  #get peaks to use
+  atac.peaks <- readH5AD('../joint-atac-rna.h5ad') 
+  atac.peaks <- GRanges(atac.peaks@assays@data@listData[["X"]]@Dimnames[[1]])
   # get ATAC cell IDs
   atac.cells <- CountFragments('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/atac_fragments.tsv.gz') %>% 
     filter(frequency_count>2000) %>% select(CB) %>% pull()
@@ -19,7 +20,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
   atac.frags <- CreateFragmentObject(path='/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/atac_fragments.tsv.gz',
                                    cells=atac.cells)
   # create featurematrix object
-  counts <- FeatureMatrix(fragments=atac.frags, features=GRanges(atac.peaks@Dimnames[[1]]), cells=atac.cells)
+  counts <- FeatureMatrix(fragments=atac.frags, features=atac.peaks, cells=atac.cells)
   # get cell IDs with donors assigned by vireo
   cells_to_keep <- fread('/project/gilad/kenneth/caQTL/highpass/batch1/lane1/outs/vireo/donor_ids.tsv.gz') %>% 
     filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
@@ -39,7 +40,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
       atac.frags <- CreateFragmentObject(path='/project/gilad/kenneth/caQTL/highpass/batch1/lane'%&%j%&%'/outs/atac_fragments.tsv.gz',
                                          cells=atac.cells)
       # create featurematrix object
-      counts <- FeatureMatrix(fragments=atac.frags, features=GRanges(atac.peaks@Dimnames[[1]]), cells=atac.cells)
+      counts <- FeatureMatrix(fragments=atac.frags, features=atac.peaks, cells=atac.cells)
       # get cell IDs with donors assigned by vireo
       cells_to_keep <- fread('/project/gilad/kenneth/caQTL/highpass/batch1/lane'%&%j%&%'/outs/vireo/donor_ids.tsv.gz') %>% 
         filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
@@ -59,7 +60,7 @@ if ('compiled_atac.rds' %in% list.files() == F){
     atac.frags <- CreateFragmentObject(path='/project/gilad/kenneth/caQTL/highpass/batch2/lane'%&%j%&%'/outs/atac_fragments.tsv.gz',
                                        cells=atac.cells)
     # create featurematrix object
-    counts <- FeatureMatrix(fragments=atac.frags, features=GRanges(atac.peaks@Dimnames[[1]]), cells=atac.cells)
+    counts <- FeatureMatrix(fragments=atac.frags, features=atac.peaks, cells=atac.cells)
     # get cell IDs with donors assigned by vireo
     cells_to_keep <- fread('/project/gilad/kenneth/caQTL/highpass/batch2/lane'%&%j%&%'/outs/vireo/donor_ids.tsv.gz') %>% 
       filter(donor_id %in% c('doublet','unassigned') == F) %>% select(cell) %>% pull()
