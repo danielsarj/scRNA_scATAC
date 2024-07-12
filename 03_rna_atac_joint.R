@@ -1,9 +1,6 @@
 library(Signac)
 library(Seurat)
 library(SeuratObject)
-library(tidyverse)
-library(data.table)
-"%&%" <- function(a,b) paste(a,b, sep = "")
 setwd('/project2/gilad/daraujo/scRNA_scATAC')
 
 # load datasets
@@ -40,7 +37,6 @@ atac.assay[['RNA']] <- TransferData(anchorset=transfer.anchors, refdata=refdata,
                                     dims=2:30) 
 ####load Seurat5.1.0 again
 coembed <- merge(x=rna.assay, y=atac.assay)
-#coembed[['RNA']] <- as(object=coembed[['RNA']], Class='Assay')
 coembed <- ScaleData(coembed, features=var.genes, do.scale=F)
 coembed <- RunPCA(coembed, features=var.genes, verbose=F)
 coembed <- RunUMAP(coembed, dims=1:30)
